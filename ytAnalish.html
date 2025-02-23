@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YT Video Details Extractor - Get YouTube Video Information</title>
+    <meta name="description" content="Extract complete YouTube video details including title, description, tags, statistics and thumbnail. Free online YouTube metadata analyzer.">
+    <meta name="keywords" content="YouTube analyzer, video details extractor, YouTube metadata, video tags extractor">
+    <meta name="author" content="YT Analyzer">
+    <style>
+        :root {
+            --primary-color: #FF3C3C;
+            --secondary-color: #2196F3;
+            --accent-color: #4CAF50;
+            --dark-bg: #1a1a1a;
+            --gradient-start: #FF416C;
+            --gradient-end: #FF4B2B;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', system-ui, sans-serif;
+        }
+
+        body {
+            background: #f8f9fa;
+            min-height: 100vh;
+        }
+
+        header {
+            background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
+            padding: 1rem;
+            box-shadow: 0 4px 15px rgba(255, 65, 108, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+        }
+
+        .logo-img {
+            height: 40px;
+            width: auto;
+        }
+
+        .logo-text {
+            color: white;
+            font-size: 1.8rem;
+            font-weight: 700;
+        }
+
+        .nav-menu {
+            display: flex;
+            gap: 30px;
+            list-style: none;
+        }
+
+        .nav-menu a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            transition: opacity 0.3s;
+        }
+
+        .nav-menu a:hover {
+            opacity: 0.8;
+            text-decoration: underline;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 3rem auto;
+            padding: 0 1.5rem;
+            animation: fadeIn 0.6s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            color: var(--dark-bg);
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+
+        .intro-text {
+            font-size: 1.1rem;
+            color: #555;
+            line-height: 1.6;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .input-group {
+            margin: 3rem 0;
+            text-align: center;
+            position: relative;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 1.2rem;
+            font-size: 1.1rem;
+            border: 2px solid #e0e0e0;
+            border-radius: 50px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        input[type="text"]:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 4px 15px rgba(255, 65, 108, 0.2);
+            transform: scale(1.02);
+        }
+
+        button {
+            padding: 1rem 2rem;
+            background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
+            color: white;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            margin-top: 1.5rem;
+            box-shadow: 0 4px 15px rgba(255, 65, 108, 0.3);
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 65, 108, 0.4);
+        }
+
+        .results {
+            margin-top: 2rem;
+            padding: 2rem;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            animation: slideUp 0.5s ease-out;
+            display: none;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .video-info img {
+            max-width: 100%;
+            height: auto;
+            margin-top: 1rem;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .video-info img:hover {
+            transform: scale(1.02);
+        }
+
+        footer {
+            background: var(--dark-bg);
+            color: rgba(255,255,255,0.8);
+            text-align: center;
+            padding: 1.5rem;
+            margin-top: auto;
+        }
+
+        .tags-container {
+            margin: 1.5rem 0;
+            padding: 1rem;
+            background: #f8f9fa;
+            border-radius: 15px;
+        }
+
+        .tag {
+            display: inline-block;
+            background: linear-gradient(135deg, var(--secondary-color), #1976D2);
+            color: white;
+            padding: 6px 16px;
+            margin: 6px;
+            border-radius: 25px;
+            font-size: 0.9em;
+            transition: transform 0.2s ease;
+            cursor: pointer;
+        }
+
+        .tag:hover {
+            transform: translateY(-2px);
+        }
+
+        .copy-btn {
+            background: linear-gradient(135deg, var(--accent-color), #45a049);
+            padding: 8px 18px;
+            border-radius: 25px;
+            transition: all 0.3s ease;
+        }
+
+        .copy-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
+        }
+
+        .download-thumbnail {
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(5px);
+            padding: 10px 20px;
+            border-radius: 25px;
+            transition: all 0.3s ease;
+        }
+
+        .download-thumbnail:hover {
+            background: rgba(0, 0, 0, 0.9);
+            transform: scale(1.05);
+        }
+
+        .loading-spinner {
+            display: none;
+            width: 40px;
+            height: 40px;
+            margin: 2rem auto;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid var(--primary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin: 1.5rem 0;
+        }
+
+        .stat-box {
+            background: #f8f9fa;
+            padding: 1.5rem;
+            border-radius: 15px;
+            text-align: center;
+            transition: transform 0.3s ease;
+        }
+
+        .stat-box:hover {
+            transform: translateY(-5px);
+        }
+
+        .features-section {
+            margin: 4rem 0;
+            padding: 2rem;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+
+        .features-section h3 {
+            color: var(--primary-color);
+            font-size: 1.8rem;
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+
+        .features-list {
+            display: grid;
+            gap: 1.5rem;
+            list-style: none;
+        }
+
+        .features-list li {
+            padding: 1rem;
+            background: #f8f9fa;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="loading-spinner" id="loadingSpinner"></div>
+
+    <header>
+        <nav class="nav">
+            <a href="#" class="logo-container">
+                <img src="data:image/png;base64,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" 
+                     alt="YT Analyzer Logo" 
+                     class="logo-img">
+                <span class="logo-text">YT Analyzer</span>
+            </a>
+            
+            <ul class="nav-menu">
+                <li><a href="#features">Features</a></li>
+                <li><a href="#about">About</a></li>
+                <li><a href="#contact">Contact</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <div class="container">
+        <h1>YouTube Video Metadata Extractor</h1>
+        
+        <p class="intro-text">
+            Unlock complete YouTube video analytics with our free online tool. Get detailed information 
+            including video title, description, tags, view count, likes, comments, and high-quality 
+            thumbnails instantly.
+        </p>
+
+        <div class="input-group">
+            <input type="text" id="videoUrl" placeholder="Paste YouTube Video URL Here...">
+            <button onclick="extractDetails()">Analyze Video</button>
+        </div>
+
+        <div class="features-section">
+            <h3>Why Choose Our Tool?</h3>
+            <ul class="features-list">
+                <li>✓ Instant Video Analysis</li>
+                <li>✓ SEO-Friendly Metadata Extraction</li>
+                <li>✓ High-Quality Thumbnail Download</li>
+                <li>✓ 100% Free & No Registration</li>
+            </ul>
+        </div>
+
+        <div class="error" id="errorMessage"></div>
+        <div class="results" id="results">
+            <div class="video-info" id="videoInfo"></div>
+        </div>
+    </div>
+
+    <div class="feedback" id="feedback"></div>
+
+    <footer>
+        <p>© 2023 YT Analyzer. All rights reserved.</p>
+    </footer>
+
+    <script>
+        const API_KEY = 'AIzaSyAsg4BI7ZO1nRQq3E88bEZBrzlupKG07EY';
+
+        function extractDetails() {
+            const videoUrl = document.getElementById('videoUrl').value;
+            const errorMessage = document.getElementById('errorMessage');
+            const results = document.getElementById('results');
+            const videoInfo = document.getElementById('videoInfo');
+            const loadingSpinner = document.getElementById('loadingSpinner');
+
+            loadingSpinner.style.display = 'block';
+            errorMessage.textContent = '';
+            results.style.display = 'none';
+            videoInfo.innerHTML = '';
+
+            const videoId = getVideoId(videoUrl);
+            if (!videoId) {
+                errorMessage.textContent = 'Please enter a valid YouTube URL';
+                loadingSpinner.style.display = 'none';
+                return;
+            }
+
+            fetch(`https://www.googleapis.com/youtube/v3/videos?part=snippet,statistics&id=${videoId}&key=${API_KEY}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.items && data.items.length > 0) {
+                        const snippet = data.items[0].snippet;
+                        const stats = data.items[0].statistics;
+
+                        const html = `
+                            <div class="copy-section">
+                                <h2>${snippet.title} 
+                                    <button class="copy-btn" onclick="copyTitle()">Copy Title</button>
+                                </h2>
+                            </div>
+
+                            <div class="thumbnail-container">
+                                <img src="${snippet.thumbnails.high.url}" alt="Thumbnail">
+                                <button class="download-thumbnail" onclick="downloadThumbnail('${snippet.thumbnails.high.url}', '${snippet.title}')">
+                                    Download Thumbnail
+                                </button>
+                            </div>
+                            
+                            <div class="stats-grid">
+                                <div class="stat-box">
+                                    <h4>Channel</h4>
+                                    <p>${snippet.channelTitle}</p>
+                                </div>
+                                <div class="stat-box">
+                                    <h4>Published</h4>
+                                    <p>${new Date(snippet.publishedAt).toLocaleDateString()}</p>
+                                </div>
+                                <div class="stat-box">
+                                    <h4>Views</h4>
+                                    <p>${Number(stats.viewCount).toLocaleString()}</p>
+                                </div>
+                                <div class="stat-box">
+                                    <h4>Likes</h4>
+                                    <p>${Number(stats.likeCount).toLocaleString()}</p>
+                                </div>
+                            </div>
+
+                            <div class="tags-container">
+                                <h3>Keywords/Tags:
+                                    ${snippet.tags ? `<button class="copy-btn" onclick="copyTags()">Copy All Tags</button>` : ''}
+                                </h3>
+                                ${snippet.tags ? 
+                                    snippet.tags.map(tag => 
+                                        `<span class="tag">${tag}</span>`
+                                    ).join(' ') : 
+                                    '<p>No tags available</p>'
+                                }
+                            </div>
+
+                            <div class="copy-section">
+                                <h3>Description: 
+                                    <button class="copy-btn" onclick="copyDescription()">Copy Description</button>
+                                </h3>
+                                <p>${snippet.description}</p>
+                            </div>
+                        `;
+
+                        videoInfo.innerHTML = html;
+                        results.style.display = 'block';
+                    } else {
+                        errorMessage.textContent = 'Video not found';
+                    }
+                })
+                .catch(error => {
+                    errorMessage.textContent = 'Error fetching video details';
+                    console.error(error);
+                })
+                .finally(() => {
+                    loadingSpinner.style.display = 'none';
+                });
+        }
+
+        function getVideoId(url) {
+            const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+            const match = url.match(regExp);
+            return (match && match[2].length === 11) ? match[2] : null;
+        }
+
+        function copyTitle() {
+            const title = document.querySelector('#videoInfo h2').textContent.replace('Copy Title','').trim();
+            copyToClipboard(title);
+        }
+
+        function copyDescription() {
+            const desc = document.querySelector('#videoInfo .copy-section:last-child p').textContent;
+            copyToClipboard(desc);
+        }
+
+        function copyTags() {
+            const tags = Array.from(document.querySelectorAll('.tag'))
+                           .map(tag => tag.textContent)
+                           .join(', ');
+            copyToClipboard(tags);
+        }
+
+        function downloadThumbnail(url, title) {
+            const sanitizedTitle = title
+                .replace(/[^a-zA-Z0-9 ]/g, '')
+                .replace(/\s+/g, '_')
+                .substring(0, 30);
+            
+            fetch(url)
+                .then(response => response.blob())
+                .then(blob => {
+                    const blobUrl = window.URL.createObjectURL(blob);
+                    const link = document.createElement('a');
+                    link.href = blobUrl;
+                    link.download = `YT_Thumbnail_${sanitizedTitle}.jpg`;
+                    
+                    document.body.appendChild(link);
+                    link.click();
+                    
+                    window.URL.revokeObjectURL(blobUrl);
+                    document.body.removeChild(link);
+                    
+                    showFeedback('Thumbnail downloaded successfully! 📸');
+                })
+                .catch(error => {
+                    console.error('Download error:', error);
+                    showFeedback('Download failed! ❌', true);
+                });
+        }
+
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text)
+                .then(() => showFeedback())
+                .catch(err => console.error('Copy failed:', err));
+        }
+
+        function showFeedback(message = 'Copied to clipboard! 📋', isError = false) {
+            const feedback = document.getElementById('feedback');
+            feedback.textContent = message;
+            feedback.style.background = isError ? '#ff4444' : '#4CAF50';
+            feedback.style.display = 'block';
+            setTimeout(() => {
+                feedback.style.display = 'none';
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
